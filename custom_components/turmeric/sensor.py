@@ -36,6 +36,7 @@ class TurmericSensor(CoordinatorEntity, Entity):
                     item["name"]
                     for item in self.coordinator.data["groceries"]["result"]
                     if isinstance(item, dict) and "name" in item
+                    and not item.get("purchased", False)
                 ]
                 return (
                     ", ".join(items)
@@ -71,6 +72,8 @@ class TurmericSensor(CoordinatorEntity, Entity):
                 aisles: dict[str, list[str]] = {}
                 for item in self.coordinator.data["groceries"]["result"]:
                     if not isinstance(item, dict) or "name" not in item:
+                        continue
+                    if item.get("purchased", False):
                         continue
                     aisle = item.get("aisle", "Uncategorized")
                     aisles.setdefault(aisle, []).append(item["name"])
